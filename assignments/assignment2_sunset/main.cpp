@@ -80,7 +80,7 @@ int main() {
 	ImGui_ImplOpenGL3_Init();
 
 	ir::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	unsigned int vao = createVAO(vertices, 6, indices, 6);
+	unsigned int vao = createVAO(vertices, 4, indices, 6);
 	
 	shader.use();
 	glBindVertexArray(vao);
