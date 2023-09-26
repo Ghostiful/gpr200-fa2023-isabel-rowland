@@ -8,6 +8,12 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include <ir/shader.h>
+
+std::string vertexShaderSource = ir::loadShaderSourceFromFile("assets/vertexShader.vert");
+std::string fragmentShaderSource = ir::loadShaderSourceFromFile("assets/fragmentShader.frag");
+unsigned int shader = createShaderProgram(vertexShaderSource.c_str(), fragmentShaderSource.c_str());
+
 unsigned int createShader(GLenum shaderType, const char* sourceCode);
 unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 unsigned int createVAO(float* vertexData, int numVertices);
