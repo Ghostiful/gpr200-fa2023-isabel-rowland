@@ -20,7 +20,7 @@ struct Vertex {
 };
 
 unsigned int createShader(GLenum shaderType, const char* sourceCode);
-unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
+// unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
