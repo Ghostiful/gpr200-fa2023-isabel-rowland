@@ -30,7 +30,11 @@ void main(){
     
     // Switch to -1 to 1
     
-    uv = (2.0*UV-iResolution.xy)/iResolution.y;
+    // uv = // (2.0*UV-iResolution.xy)/iResolution.y;
+
+    uv = uv * 2 - 1;
+
+    uv.x *= iResolution.x / iResolution.y;
     
     // float edge = floor(iTime)*0.5 + 0.5;
     
