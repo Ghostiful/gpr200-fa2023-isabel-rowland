@@ -11,12 +11,16 @@
 #include <ew/shader.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
+#include "ir/shader.h"
+#include "ir/transformations.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 //Square aspect ratio for now. We will account for this with projection later.
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
+
+ir::Transform Cube;
 
 int main() {
 	printf("Initializing...");
@@ -51,7 +55,7 @@ int main() {
 	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	ir::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
@@ -66,6 +70,7 @@ int main() {
 		shader.use();
 
 		//TODO: Set model matrix uniform
+		shader.setMat4("_Model", Cube.getModelMatrix());
 
 		cubeMesh.draw();
 
@@ -76,6 +81,9 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Transform");
+			ImGui::DragFloat3("Position", &Cube.position.x, 0.05f);
+			ImGui::DragFloat3("Rotation", &Cube.rotation.x, 0.05f);
+			ImGui::DragFloat3("Scale", &Cube.scale.x, 0.05f);
 			ImGui::End();
 
 			ImGui::Render();
