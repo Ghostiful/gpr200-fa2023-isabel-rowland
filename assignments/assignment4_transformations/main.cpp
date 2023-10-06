@@ -20,7 +20,14 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
 
-ir::Transform Cube;
+const int NUM_CUBES = 4;
+
+ir::Transform Cube[NUM_CUBES] = {
+	{ew::Vec3(-0.5, 0.5, 0.0)},
+	{ew::Vec3(0.5, 0.5, 0.0)},
+	{ew::Vec3(-0.5, -0.5, 0.0)},
+	{ew::Vec3(0.5, -0.5, 0.0)}
+};
 
 int main() {
 	printf("Initializing...");
@@ -70,8 +77,13 @@ int main() {
 		shader.use();
 
 		//TODO: Set model matrix uniform
-		shader.setMat4("_Model", Cube.getModelMatrix());
-
+		shader.setMat4("_Model", Cube[0].getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", Cube[1].getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", Cube[2].getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", Cube[3].getModelMatrix());
 		cubeMesh.draw();
 
 		//Render UI
@@ -81,9 +93,17 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Transform");
-			ImGui::DragFloat3("Position", &Cube.position.x, 0.05f);
-			ImGui::DragFloat3("Rotation", &Cube.rotation.x, 0.05f);
-			ImGui::DragFloat3("Scale", &Cube.scale.x, 0.05f);
+			for (size_t i = 0; i < NUM_CUBES; i++)
+			{
+				ImGui::PushID(i);
+				if (ImGui::CollapsingHeader("Transform")) {
+					ImGui::DragFloat3("Position", &Cube[i].position.x, 0.05f);
+					ImGui::DragFloat3("Rotation", &Cube[i].rotation.x, 0.05f);
+					ImGui::DragFloat3("Scale", &Cube[i].scale.x, 0.05f);
+				}
+				ImGui::PopID();
+			}
+
 			ImGui::End();
 
 			ImGui::Render();
