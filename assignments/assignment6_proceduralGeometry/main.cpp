@@ -94,16 +94,24 @@ int main() {
 	// Create Plane
 	ew::MeshData planeMeshData = ir::createPlane(0.5f, 10);
 	ew::Mesh planeMesh(planeMeshData);
-	//Initialize transform
+	//Initialize transforms
 	ew::Transform planeTransform;
 	planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
 	// Create Cylinder
 	ew::MeshData cylinderMeshData = ir::createCylinder(1.0f, 0.5f, 16);
 	ew::Mesh cylinderMesh(cylinderMeshData);
-	// Initialize transform
+	// Initialize transforms
 	ew::Transform cylinderTransform;
 	cylinderTransform.position = ew::Vec3(2.5f, 0.0f, 0.0f);
+
+	// Create sphere
+	ew::MeshData sphereMeshData = ir::createSphere(0.5f, 32);
+	ew::Mesh sphereMesh(sphereMeshData);
+	// Initialize transforms
+	ew::Transform sphereTransform;
+	sphereTransform.position = ew::Vec3(4.0f, 0.0f, 0.0f);
+	
 
 	resetCamera(camera,cameraController);
 
@@ -148,6 +156,10 @@ int main() {
 		//Draw cylinder
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw sphere
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 
 		//Render UI

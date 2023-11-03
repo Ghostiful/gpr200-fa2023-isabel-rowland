@@ -18,6 +18,8 @@ ew::MeshData ir::createSphere(float radius, int numSegments)
 			v.pos.x = radius * cos(theta) * sin(phi);
 			v.pos.y = radius * cos(phi);
 			v.pos.z = radius * sin(theta) * sin(phi);
+			v.uv = ew::Vec2(ew::PI * radius / numSegments * col, ew::PI * radius / numSegments * (numSegments - row));
+			v.normal = ew::Normalize(v.pos);
 			newMesh.vertices.push_back(v);
 		}
 	}
@@ -28,9 +30,31 @@ ew::MeshData ir::createSphere(float radius, int numSegments)
 		newMesh.indices.push_back(poleStart + i);
 		newMesh.indices.push_back(sideStart + i + 1);
 	}
+	int start;
+	int columns = numSegments + 1;
+	for (row = 1; row < numSegments - 1; row++) {
+		for (col = 0; col < numSegments; col++) {
+			start = row * columns + col;
+			//Triangle 1
+			newMesh.indices.push_back(start);
+			newMesh.indices.push_back(start + 1);
+			newMesh.indices.push_back(start + columns);
+			//Triangle 2
+			newMesh.indices.push_back(start + 1);
+			newMesh.indices.push_back(start + columns + 1);
+			newMesh.indices.push_back(start + columns);
+		}
+	}
+	poleStart = newMesh.vertices.size() - numSegments;
+	sideStart = poleStart - numSegments - 2;
+	for (i = 0; i < numSegments; i++) {
+		newMesh.indices.push_back(sideStart + i + 1);
+		newMesh.indices.push_back(poleStart + i);
+		newMesh.indices.push_back(sideStart + i);
+	}
 
 
-	return ew::MeshData();
+	return newMesh;
 }
 
 ew::MeshData ir::createCylinder(float height, float radius, int numSegments)
