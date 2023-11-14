@@ -17,6 +17,7 @@
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
+const int MAX_LIGHTS = 4;
 
 int SCREEN_WIDTH = 1080;
 int SCREEN_HEIGHT = 720;
@@ -80,20 +81,31 @@ int main() {
 	ew::Mesh planeMesh(ew::createPlane(5.0f, 5.0f, 10));
 	ew::Mesh sphereMesh(ew::createSphere(0.5f, 64));
 	ew::Mesh cylinderMesh(ew::createCylinder(0.5f, 1.0f, 32));
+	ew::Mesh lightMesh(ew::createSphere(0.25f, 64));
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
 	ew::Transform planeTransform;
 	ew::Transform sphereTransform;
 	ew::Transform cylinderTransform;
+	ew::Transform lightTransform;
 	planeTransform.position = ew::Vec3(0, -1.0, 0);
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
+	
 
 	// Set up light
-	Light light;
-	light.color = ew::Vec3(1, 0, 0);
-	light.position = ew::Vec3(1.0f, 1.5f, 0.0f);
+	Light lights[MAX_LIGHTS];
+	lights[0].color = ew::Vec3(1, 0, 0);
+	lights[0].position = ew::Vec3(1.0f, 1.5f, 0.0f);
+	lightTransform.position = lights[0].position;
+
+	// Set material values
+	Material material;
+	material.ambientK = 0.25;
+	material.diffuseK = 0.6;
+	material.shininess = 256;
+	material.specular = 0.5;
 
 	resetCamera(camera,cameraController);
 
@@ -131,10 +143,20 @@ int main() {
 		cylinderMesh.draw();
 
 		//TODO: Render point lights
-		shader.setVec3("_Light.position", light.position);
-		shader.setVec3("_Light.color", light.color);
+		shader.setVec3("_Lights[0].position", lights[0].position);
+		shader.setVec3("_Lights[0].color", lights[0].color);
+		shader.setFloat("_Material.ambientK", material.ambientK);
+		shader.setFloat("_Material.diffuseK", material.diffuseK);
+		shader.setFloat("_Material.shininess", material.shininess);
+		shader.setFloat("_Material.specular", material.specular);
+		shader.setVec3("_CameraPos", camera.position);
 
-		shader2.setMat4("_Model", sphereTransform.getModelMatrix());
+		shader2.use();
+		shader2.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+
+		shader2.setMat4("_Model", lightTransform.getModelMatrix());
+		shader2.setVec3("_Color", light.color);
+		lightMesh.draw();
 
 		//Render UI
 		{
@@ -160,6 +182,12 @@ int main() {
 				if (ImGui::Button("Reset")) {
 					resetCamera(camera, cameraController);
 				}
+			}
+			if (ImGui::CollapsingHeader("Lighting")) {
+				ImGui::SliderFloat("AmbientK", &material.ambientK, 0.0f, 1.0f);
+				ImGui::SliderFloat("DiffuseK", &material.diffuseK, 0.0f, 1.0f);
+				ImGui::DragFloat("Shininess", &material.shininess, 1.0f, 2.0f);
+				ImGui::SliderFloat("Specular", &material.specular, 0.0f, 1.0f);
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
