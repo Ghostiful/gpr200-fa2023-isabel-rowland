@@ -27,6 +27,19 @@ ew::Vec3 bgColor = ew::Vec3(0.1f);
 ew::Camera camera;
 ew::CameraController cameraController;
 
+struct Light {
+	ew::Vec3 position;
+	ew::Vec3 color;
+};
+
+struct Material {
+	float ambientK; //Ambient coefficient (0-1)
+	float diffuseK; //Diffuse coefficient (0-1)
+	float specular; //Specular coefficient (0-1)
+	float shininess; //Shininess
+};
+
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -59,6 +72,7 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
+	ew::Shader shader2("assets/unlit.vert", "assets/unlit.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
 	//Create cube
@@ -75,6 +89,11 @@ int main() {
 	planeTransform.position = ew::Vec3(0, -1.0, 0);
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
+
+	// Set up light
+	Light light;
+	light.color = ew::Vec3(1, 0, 0);
+	light.position = ew::Vec3(1.0f, 1.5f, 0.0f);
 
 	resetCamera(camera,cameraController);
 
@@ -112,6 +131,10 @@ int main() {
 		cylinderMesh.draw();
 
 		//TODO: Render point lights
+		shader.setVec3("_Light.position", light.position);
+		shader.setVec3("_Light.color", light.color);
+
+		shader2.setMat4("_Model", sphereTransform.getModelMatrix());
 
 		//Render UI
 		{
