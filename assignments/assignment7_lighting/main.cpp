@@ -208,6 +208,10 @@ int main() {
 				ImGui::DragFloat("Shininess", &material.shininess, 1.0f, 2.0f);
 				ImGui::SliderFloat("Specular", &material.specular, 0.0f, 1.0f);
 				ImGui::DragInt("Lights", &numLights, 1.0f, 1.0f, 4.0f);
+				ImGui::ColorEdit3("Light Color 1", &lights[0].color.x);
+				ImGui::ColorEdit3("Light Color 2", &lights[1].color.x);
+				ImGui::ColorEdit3("Light Color 3", &lights[2].color.x);
+				ImGui::ColorEdit3("Light Color 4", &lights[3].color.x);
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
