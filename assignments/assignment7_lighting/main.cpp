@@ -82,23 +82,32 @@ int main() {
 	ew::Mesh sphereMesh(ew::createSphere(0.5f, 64));
 	ew::Mesh cylinderMesh(ew::createCylinder(0.5f, 1.0f, 32));
 	ew::Mesh lightMesh(ew::createSphere(0.25f, 64));
+	
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
 	ew::Transform planeTransform;
 	ew::Transform sphereTransform;
 	ew::Transform cylinderTransform;
-	ew::Transform lightTransform;
+	ew::Transform lightTransforms[MAX_LIGHTS];
 	planeTransform.position = ew::Vec3(0, -1.0, 0);
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 	
 
-	// Set up light
+	// Set up lights
 	Light lights[MAX_LIGHTS];
+	int numLights = 1;
 	lights[0].color = ew::Vec3(1, 0, 0);
-	lights[0].position = ew::Vec3(1.0f, 1.5f, 0.0f);
-	lightTransform.position = lights[0].position;
+	lights[1].color = ew::Vec3(0, 1, 0);
+	lights[2].color = ew::Vec3(0, 0, 1);
+	lights[3].color = ew::Vec3(0.5, 0, 0.5);
+	for (int i = 0; i < MAX_LIGHTS; i++) {
+		
+		lights[i].position = ew::Vec3(2 * cos(i * ew::PI / 2), 1.5f, 2 * sin(i * ew::PI / 2));
+		lightTransforms[i].position = lights[i].position;
+	}
+
 
 	// Set material values
 	Material material;
@@ -145,18 +154,28 @@ int main() {
 		//TODO: Render point lights
 		shader.setVec3("_Lights[0].position", lights[0].position);
 		shader.setVec3("_Lights[0].color", lights[0].color);
+		shader.setVec3("_Lights[1].position", lights[1].position);
+		shader.setVec3("_Lights[1].color", lights[1].color);
+		shader.setVec3("_Lights[2].position", lights[2].position);
+		shader.setVec3("_Lights[2].color", lights[2].color);
+		shader.setVec3("_Lights[3].position", lights[3].position);
+		shader.setVec3("_Lights[3].color", lights[3].color);
 		shader.setFloat("_Material.ambientK", material.ambientK);
 		shader.setFloat("_Material.diffuseK", material.diffuseK);
 		shader.setFloat("_Material.shininess", material.shininess);
 		shader.setFloat("_Material.specular", material.specular);
 		shader.setVec3("_CameraPos", camera.position);
+		shader.setInt("_NumLights", numLights);
 
 		shader2.use();
 		shader2.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
 
-		shader2.setMat4("_Model", lightTransform.getModelMatrix());
-		shader2.setVec3("_Color", light.color);
-		lightMesh.draw();
+		for (int i = 0; i < numLights; i++) {
+			shader2.setMat4("_Model", lightTransforms[i].getModelMatrix());
+			shader2.setVec3("_Color", lights[i].color);
+			lightMesh.draw();
+		}
+		
 
 		//Render UI
 		{
@@ -188,6 +207,7 @@ int main() {
 				ImGui::SliderFloat("DiffuseK", &material.diffuseK, 0.0f, 1.0f);
 				ImGui::DragFloat("Shininess", &material.shininess, 1.0f, 2.0f);
 				ImGui::SliderFloat("Specular", &material.specular, 0.0f, 1.0f);
+				ImGui::DragInt("Lights", &numLights, 1.0f, 1.0f, 4.0f);
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);

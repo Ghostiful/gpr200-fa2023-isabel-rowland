@@ -24,17 +24,18 @@ uniform sampler2D _Texture;
 uniform Material _Material;
 uniform Light _Lights[MAX_LIGHTS];
 uniform vec3 _CameraPos;
+uniform int _NumLights;
 
 
 void main(){
 	vec3 normal = normalize(fs_in.WorldNormal);
-	vec3 lightColor;
+	vec3 lightColor = vec3(0, 0, 0);
 	
 	int i;
-	for (i = 0; i < MAX_LIGHTS; i++) {
+	for (i = 0; i < _NumLights; i++) {
 		vec3 w = normalize(_Lights[i].position - fs_in.WorldPosition);
 		vec3 h = normalize(w + normalize(_CameraPos - fs_in.WorldPosition));
-		lightColor = _Lights[i].color * _Material.ambientK;
+		lightColor += _Lights[i].color * _Material.ambientK;
 		lightColor += _Lights[i].color * _Material.diffuseK * max(dot(w, normal), 0);
 		lightColor += _Lights[i].color * _Material.specular * pow(max(dot(h, normal), 0), _Material.shininess);
 	}
